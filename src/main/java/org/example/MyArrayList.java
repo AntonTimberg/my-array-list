@@ -2,6 +2,7 @@ package org.example;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
@@ -22,6 +23,7 @@ import java.util.function.Consumer;
 public class MyArrayList<T> implements MyList<T>, Iterable {
     private Object[] elements; //Хранит элементы списка, может содержать пустые ячейки
     private int size; //Отражает количество элементов в списке, без пустых ячеек
+    private int modCount = 0; // Счетчик модификаций коллекции
 
     /**
      * Инициализация начальной емкости списка.
@@ -40,6 +42,7 @@ public class MyArrayList<T> implements MyList<T>, Iterable {
     public void add(T element) {
         ensureCapacity();
         elements[size++] = element;
+        modCount++;
     }
 
     /**
@@ -182,6 +185,7 @@ public class MyArrayList<T> implements MyList<T>, Iterable {
      */
     private class MyArrayListIterator implements Iterator{
         private int currentIndex = 0; // Текущий индекс итератора
+        private final int expectedModCount = modCount;
 
         /**
          * Проверяет, существует ли следующий элемент в списке.
@@ -190,6 +194,7 @@ public class MyArrayList<T> implements MyList<T>, Iterable {
          */
         @Override
         public boolean hasNext() {
+            checkForComodification();
             return currentIndex < size;
         }
 
@@ -201,6 +206,7 @@ public class MyArrayList<T> implements MyList<T>, Iterable {
          */
         @Override
         public T next() {
+            checkForComodification();
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
@@ -228,6 +234,12 @@ public class MyArrayList<T> implements MyList<T>, Iterable {
         @Override
         public void forEachRemaining(Consumer action) {
             Iterator.super.forEachRemaining(action);
+        }
+
+        final void checkForComodification() {
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
         }
     }
 }
