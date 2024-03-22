@@ -61,6 +61,7 @@ public class MyArrayList<T> implements MyList<T>, Iterable {
         System.arraycopy(elements, index, elements, index + 1, size - index);
         elements[index] = element;
         size++;
+        modCount++;
     }
 
     /**
@@ -94,6 +95,7 @@ public class MyArrayList<T> implements MyList<T>, Iterable {
             System.arraycopy(elements, index + 1, elements, index, numMoved);
         }
         elements[--size] = null;
+        modCount++;
     }
 
     /**
@@ -104,6 +106,7 @@ public class MyArrayList<T> implements MyList<T>, Iterable {
         for (int i = 0; i < size; i++)
             elements[i] = null;
         size = 0;
+        modCount++;
     }
 
     /**
@@ -116,6 +119,7 @@ public class MyArrayList<T> implements MyList<T>, Iterable {
         T[] copyOfElements = (T[]) Arrays.copyOf(elements, size, elements.getClass());
         MyQuickSort.sort(copyOfElements, comparator);
         System.arraycopy(copyOfElements, 0, elements, 0, size);
+        modCount++;
     }
 
     /**
@@ -131,6 +135,7 @@ public class MyArrayList<T> implements MyList<T>, Iterable {
             throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
         }
         elements[index] = element;
+        modCount++;
     }
 
     /**
@@ -142,6 +147,7 @@ public class MyArrayList<T> implements MyList<T>, Iterable {
             Object[] newElements = new Object[size];
             System.arraycopy(elements, 0, newElements, 0, size);
             elements = newElements;
+            modCount++;
         }
     }
 
