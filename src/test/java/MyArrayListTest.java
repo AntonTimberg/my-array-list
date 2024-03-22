@@ -70,6 +70,24 @@ public class MyArrayListTest {
         assertEquals(3, intList.get(2));
     }
 
+    @Test
+    void addThousandAndRemoveHalfTwiceTest(){
+        for (int i = 0; i < 1000; i++) {
+            intList.add(i);
+        }
+        assertEquals(1000, intList.size());
+
+        for (int i = 1000 - 1; i > 500 - 1; i--) {
+            intList.remove(i);
+        }
+        assertEquals(500, intList.size());
+
+        for (int i = 500 - 1; i >= 0; i--) {
+            intList.remove(i);
+        }
+        assertEquals(0, intList.size());
+    }
+
 //    @Test
 //    void trimToSizeAndCapacityTest(){
 //        for (int i = 0; i < 22; i++) {
