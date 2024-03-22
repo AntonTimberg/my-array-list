@@ -2,6 +2,9 @@ package org.example;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.function.Consumer;
 
 /**
  * Реализация списка на основе массива Object, поддерживающая элементы обобщённого типа {@code T}.
@@ -16,7 +19,7 @@ import java.util.Comparator;
  *
  * @param <T> тип элементов, хранящихся в списке
  */
-public class MyArrayList<T> implements MyList<T> {
+public class MyArrayList<T> implements MyList<T>, Iterable {
     private Object[] elements; //Хранит элементы списка, может содержать пустые ячейки
     private int size; //Отражает количество элементов в списке, без пустых ячеек
 
@@ -141,8 +144,6 @@ public class MyArrayList<T> implements MyList<T> {
 
     /**
      * Возвращает количество элементов в списке.
-     *
-     * @return текущее количество элементов в списке
      */
     @Override
     public int size() {
@@ -161,12 +162,72 @@ public class MyArrayList<T> implements MyList<T> {
         }
     }
 
-//    /**
+    //    /**
 //     * Возвращает текущую емкость списка.
-//     *
-//     * @return емкость массива, используемого для хранения элементов списка
 //     */
 //    public int capacity() {
 //        return elements.length;
 //    }
+
+    /**
+     * Возвращает итератор для обхода элементов списка.
+     */
+    @Override
+    public Iterator iterator() {
+        return new MyArrayListIterator();
+    }
+
+    /**
+     * Внутренний класс - реализация итератора для MyArrayList.
+     */
+    private class MyArrayListIterator implements Iterator{
+        private int currentIndex = 0; // Текущий индекс итератора
+
+        /**
+         * Проверяет, существует ли следующий элемент в списке.
+         *
+         * @return true, если следующий элемент существует, иначе false.
+         */
+        @Override
+        public boolean hasNext() {
+            return currentIndex < size;
+        }
+
+        /**
+         * Возвращает следующий элемент в списке, сдвигает итератор вперёд.
+         *
+         * @return следующий элемент списка
+         * @throws NoSuchElementException если следующего элемента не существует
+         */
+        @Override
+        public T next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return (T) elements[currentIndex++];
+        }
+
+        /**
+         * Удаляет последний возвращенный элемент.
+         *
+         * @throws IllegalStateException если метод {@code remove()} вызван некорректно
+         */
+        @Override
+        public void remove() {
+            if (currentIndex == 0 || elements[currentIndex - 1] == null) {
+                throw new IllegalStateException();
+            }
+            MyArrayList.this.remove(--currentIndex);
+        }
+
+        /**
+         * Выполняет заданное действие для каждого оставшегося элемента в списке.
+         *
+         * @param action действие, которое будет выполнено для каждого элемента
+         */
+        @Override
+        public void forEachRemaining(Consumer action) {
+            Iterator.super.forEachRemaining(action);
+        }
+    }
 }
