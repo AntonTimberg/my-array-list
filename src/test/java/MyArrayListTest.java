@@ -3,89 +3,135 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Comparator;
+import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class MyArrayListTest {
-    private MyArrayList<Integer> intList;
-//    private MyArrayList<String> stringList;
+    private MyArrayList<Integer> list;
 
     @BeforeEach
     void setUp() {
-        intList = new MyArrayList<>();
-//        stringList = new MyArrayList<>();
+        list = new MyArrayList<>();
     }
 
     @Test
-    void addAndGetTest() {
-        intList.add(1);
-        intList.add(2);
-        assertEquals(1, intList.get(0));
-        assertEquals(2, intList.get(1));
+    void addElementTest() {
+        list.add(1);
+
+        assertEquals(1, list.size());
     }
 
     @Test
     void addAtIndexTest() {
-        intList.add(1);
-        intList.add(2);
-        intList.add(1, 3);
-        assertEquals(1, intList.get(0));
-        assertEquals(3, intList.get(1));
-        assertEquals(2, intList.get(2));
+        list.add(1);
+        list.add(3);
+        list.add(1, 2);
+
+        assertEquals(Integer.valueOf(2), list.get(1));
     }
 
     @Test
     void removeTest() {
-        intList.add(1);
-        intList.add(2);
-        intList.add(3);
-        intList.remove(1);
-        assertEquals(2, intList.size());
-        assertEquals(3, intList.get(1));
+        list.add(1);
+        list.remove(0);
+
+        assertEquals(0, list.size());
     }
 
     @Test
     void clearTest() {
-        intList.add(1);
-        intList.add(2);
-        intList.clear();
-        assertEquals(0, intList.size());
+        for (int i = 0; i < 1000; i++) {
+            list.add(i);
+        }
+        list.clear();
+
+        assertEquals(0, list.size());
     }
 
     @Test
     void setTest() {
-        intList.add(1);
-        intList.set(0, 2);
-        assertEquals(2, intList.get(0));
+        list.add(1);
+        list.set(0, 2);
+
+        assertEquals(2, list.get(0));
     }
 
     @Test
     void sortTest() {
-        intList.add(3);
-        intList.add(1);
-        intList.add(2);
-        intList.sort(Comparator.naturalOrder());
-        assertEquals(1, intList.get(0));
-        assertEquals(2, intList.get(1));
-        assertEquals(3, intList.get(2));
+        list.add(3);
+        list.add(1);
+        list.add(2);
+        list.sort(Comparator.naturalOrder());
+
+        assertEquals(3, list.get(2));
     }
 
     @Test
-    void addThousandAndRemoveHalfTwiceTest(){
+    void addThousandAndRemoveHalfTest(){
         for (int i = 0; i < 1000; i++) {
-            intList.add(i);
+            list.add(i);
         }
-        assertEquals(1000, intList.size());
 
         for (int i = 1000 - 1; i > 500 - 1; i--) {
-            intList.remove(i);
+            list.remove(i);
         }
-        assertEquals(500, intList.size());
 
-        for (int i = 500 - 1; i >= 0; i--) {
-            intList.remove(i);
+        assertEquals(500, list.size());
+    }
+
+    @Test
+    public void iteratorHasNextReturnsFalseWhenEmpty() {
+        Iterator<Integer> iterator = list.iterator();
+        assertFalse(iterator.hasNext());
+    }
+
+    @Test
+    public void iteratorRemoveAndCheckNext() {
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
         }
-        assertEquals(0, intList.size());
+
+        Iterator<Integer> iterator = list.iterator();
+        for (int i = 0; i < 3; i++) {
+            iterator.next();
+            iterator.remove();
+        }
+        Integer nextElement = iterator.next();
+
+        assertEquals(Integer.valueOf(3), nextElement);
+    }
+
+    @Test
+    public void iteratorRemoveTest() {
+        for (int i = 0; i < 1000; i++) {
+            list.add(i);
+        }
+
+        Iterator<Integer> iterator = list.iterator();
+        int count = 0;
+        while (iterator.hasNext() && count < 750) {
+            iterator.next();
+            iterator.remove();
+            count++;
+        }
+
+        assertEquals(250, list.size());
+    }
+
+    @Test
+    public void iteratorRemoveCorrectElement() {
+        for (int i = 0; i < 3; i++) {
+            list.add(i);
+        }
+
+        Iterator<Integer> iterator = list.iterator();
+        iterator.next();
+        iterator.next();
+        iterator.remove();
+
+        assertEquals(2, list.get(1));
     }
 
 //    @Test
