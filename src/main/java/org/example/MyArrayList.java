@@ -20,7 +20,7 @@ import java.util.function.Consumer;
  *
  * @param <T> тип элементов, хранящихся в списке
  */
-public class MyArrayList<T> implements MyList<T>, Iterable {
+public class MyArrayList<T> implements MyList<T>, Iterable<T> {
     private Object[] elements; //Хранит элементы списка, может содержать пустые ячейки
     private int size; //Отражает количество элементов в списке, без пустых ячеек
     private int modCount = 0; // Счетчик модификаций коллекции
@@ -182,16 +182,17 @@ public class MyArrayList<T> implements MyList<T>, Iterable {
      * Возвращает итератор для обхода элементов списка.
      */
     @Override
-    public Iterator iterator() {
+    public Iterator<T> iterator() {
         return new MyArrayListIterator();
     }
 
     /**
      * Внутренний класс - реализация итератора для MyArrayList.
      */
-    private class MyArrayListIterator implements Iterator{
+    private class MyArrayListIterator implements Iterator<T>{
         private int currentIndex = 0; // Текущий индекс итератора
         private final int expectedModCount = modCount;
+        private boolean canRemove = false;
 
         /**
          * Проверяет, существует ли следующий элемент в списке.
@@ -201,7 +202,7 @@ public class MyArrayList<T> implements MyList<T>, Iterable {
         @Override
         public boolean hasNext() {
             checkForComodification();
-            return currentIndex < size;
+            return currentIndex + 1 < size;
         }
 
         /**
@@ -216,6 +217,7 @@ public class MyArrayList<T> implements MyList<T>, Iterable {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
+            canRemove = true;
             return (T) elements[currentIndex++];
         }
 
@@ -226,10 +228,15 @@ public class MyArrayList<T> implements MyList<T>, Iterable {
          */
         @Override
         public void remove() {
-            if (currentIndex == 0 || elements[currentIndex - 1] == null) {
+            if (!canRemove) {
                 throw new IllegalStateException();
             }
-            MyArrayList.this.remove(--currentIndex);
+            checkForComodification();
+
+            currentIndex--;
+            System.arraycopy(elements, currentIndex + 1, elements, currentIndex, size - currentIndex - 1);
+            elements[--size] = null;
+            canRemove = false;
         }
 
         /**
